@@ -7,7 +7,6 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper, NM & alepri
     using System.Collections.Generic;
 
     static bool _isDamageEnabled = false;
-
     static bool _isDamageOverride = false;
 
     static List<Sonic.StateID> _damageStates = new()
