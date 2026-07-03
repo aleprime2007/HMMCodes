@@ -8,23 +8,7 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "
 
     static bool _isDamageEnabled = false;
 
-    static bool _isRunBoost = false;
-
-    static List<Sonic.StateID> _boostStates = new()
-    {
-        Sonic.StateID.StateAirBoost,
-        Sonic.StateID.StateBumpJump,
-        Sonic.StateID.StateGrind,
-        Sonic.StateID.StateGrindDamage,
-        Sonic.StateID.StateGrindJump,
-        Sonic.StateID.StateGrindRoot,
-        Sonic.StateID.StateGrindStep,
-        Sonic.StateID.StateJump,
-        Sonic.StateID.StateLeftStepRun,
-        Sonic.StateID.StateRightStepRun,
-        Sonic.StateID.StateRun,
-        Sonic.StateID.StateWallMove
-    };
+    static bool _isDamageOverride = false;
 
     static List<Sonic.StateID> _damageStates = new()
     {
@@ -39,6 +23,12 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "
         Sonic.StateID.StateBounceJump,
         Sonic.StateID.StateDropDash,
         Sonic.StateID.StateSliding
+    };
+
+    static List<Sonic.StateID> _overrideStates = new()
+    {
+        Sonic.StateID.StateRun,
+        Sonic.StateID.StateAirBoost
     };
 //
 {
@@ -58,25 +48,25 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "
 
     Sonic.StateID stateId = Player.State.GetCurrentStateID<Sonic.StateID>();
 
-    if (_boostStates.Contains(stateId) && IS_STATE_FLAG(IsBoost))
+    if (IS_STATE_FLAG(IsBoost))
     {
-        if (stateId == Sonic.StateID.StateRun)
+        if (_overrideStates.Contains(stateId))
         {
-            if (!_isRunBoost)
+            if (!_isDamageOverride)
             {
                 EnableDamage();
-                _isRunBoost = true;
+                _isDamageOverride = true;
             }
         }
         else
         {
             if (!_isDamageEnabled) EnableDamage();
-            _isRunBoost = false;
+            _isDamageOverride = false;
         }
     }
     else
     {
         if (_isDamageEnabled && !_damageStates.Contains(stateId)) DisableDamage();
-        _isRunBoost = false;
+        _isDamageOverride = false;
     }
 }
