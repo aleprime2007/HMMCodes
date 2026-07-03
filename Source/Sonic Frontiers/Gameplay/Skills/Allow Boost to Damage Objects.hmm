@@ -1,4 +1,4 @@
-Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "Allows the player to damage enemies and harder physics objects by boosting through them."
+Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper, NM & aleprime2007" does "Allows the player to damage enemies and harder physics objects by boosting through them."
 //
     #include "BlackboardStatus" noemit
 
@@ -32,18 +32,15 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "
     };
 //
 {
-    void EnableDamage()
+    void SetDamage(bool in_isEnabled)
     {
-        Player.Collision.SetCollisionSphere(Player.CollisionType.Damage, 1.0f);
-        Player.Collision.SetEntityCollision(false);
-        _isDamageEnabled = true;
-    }
+        var col = in_isEnabled
+        ? Player.CollisionType.Damage
+        : Player.CollisionType.Default;
 
-    void DisableDamage()
-    {
-        Player.Collision.SetCollisionSphere(Player.CollisionType.Default, 1.0f);
-        Player.Collision.SetEntityCollision(true);
-        _isDamageEnabled = false;
+        Player.Collision.SetCollisionSphere(col, 1.0f);
+        Player.Collision.SetEntityCollision(!in_isEnabled);
+        _isDamageEnabled = in_isEnabled;
     }
 
     Sonic.StateID stateId = Player.State.GetCurrentStateID<Sonic.StateID>();
@@ -54,19 +51,19 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "
         {
             if (!_isDamageOverride)
             {
-                EnableDamage();
+                SetDamage(true);
                 _isDamageOverride = true;
             }
         }
         else
         {
-            if (!_isDamageEnabled) EnableDamage();
+            if (!_isDamageEnabled) SetDamage(true);
             _isDamageOverride = false;
         }
     }
     else
     {
-        if (_isDamageEnabled && !_damageStates.Contains(stateId)) DisableDamage();
+        if (_isDamageEnabled && !_damageStates.Contains(stateId)) SetDamage(false);
         _isDamageOverride = false;
     }
 }
