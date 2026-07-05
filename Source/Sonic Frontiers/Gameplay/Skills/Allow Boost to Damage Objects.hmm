@@ -28,7 +28,8 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper, NM & alepri
     static List<Sonic.StateID> _overrideStates = new()
     {
         Sonic.StateID.StateRun,
-        Sonic.StateID.StateAirBoost
+        Sonic.StateID.StateAirBoost,
+        Sonic.StateID.StateGrind
     };
 //
 {
