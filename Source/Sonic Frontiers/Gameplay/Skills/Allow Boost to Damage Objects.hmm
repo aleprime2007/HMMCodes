@@ -1,4 +1,4 @@
-Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "Allows the player to damage enemies and harder physics objects by boosting through them."
+Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper, NM & aleprime2007" does "Allows the player to damage enemies and harder physics objects by boosting through them."
 //
     #include "BlackboardStatus" noemit
 
@@ -6,39 +6,64 @@ Code "Allow Boost to Damage Objects" in "Gameplay/Skills" by "Hyper & NM" does "
 
     using System.Collections.Generic;
 
-    static bool _isBoostPrevious = false;
+    static bool _isDamageEnabled = false;
+    static bool _isDamageOverride = false;
 
-    static List<Sonic.StateID> _boostStates = new()
+    static List<Sonic.StateID> _damageStates = new()
     {
-        Sonic.StateID.StateAirBoost,
-        Sonic.StateID.StateBumpJump,
-        Sonic.StateID.StateGrind,
-        Sonic.StateID.StateGrindDamage,
-        Sonic.StateID.StateGrindJump,
-        Sonic.StateID.StateGrindRoot,
-        Sonic.StateID.StateGrindStep,
         Sonic.StateID.StateJump,
-        Sonic.StateID.StateLeftStepRun,
-        Sonic.StateID.StateRightStepRun,
+        Sonic.StateID.StateDoubleJump,
+        Sonic.StateID.StateSpinAttack,
+        Sonic.StateID.StateSpinDash,
+        Sonic.StateID.StateSpinBoostCharge,
+        Sonic.StateID.StateSpinBoost,
+        Sonic.StateID.StateHomingAttack,
+        Sonic.StateID.StateStompingDown,
+        Sonic.StateID.StateStompingLand,
+        Sonic.StateID.StateBounceJump,
+        Sonic.StateID.StateDropDash,
+        Sonic.StateID.StateSliding
+    };
+
+    static List<Sonic.StateID> _overrideStates = new()
+    {
         Sonic.StateID.StateRun,
-        Sonic.StateID.StateWallMove
+        Sonic.StateID.StateAirBoost
     };
 //
 {
-    Sonic.StateID _stateId = Player.State.GetCurrentStateID<Sonic.StateID>();
-    if (_boostStates.Contains(_stateId) && IS_STATE_FLAG(IsBoost))
+    void SetDamage(bool in_isEnabled)
     {
-        if (!_isBoostPrevious)
+        var col = in_isEnabled
+        ? Player.CollisionType.Damage
+        : Player.CollisionType.Default;
+
+        Player.Collision.SetCollisionSphere(col, 1.0f);
+        Player.Collision.SetEntityCollision(!in_isEnabled);
+        _isDamageEnabled = in_isEnabled;
+    }
+
+    Sonic.StateID stateId = Player.State.GetCurrentStateID<Sonic.StateID>();
+
+    if (IS_STATE_FLAG(IsBoost))
+    {
+        if (_overrideStates.Contains(stateId))
         {
-            Player.Collision.SetCollisionSphere(Player.CollisionType.Damage, 1.0f);
-            Player.Collision.SetEntityCollision(false);
-            _isBoostPrevious = true;
+            if (!_isDamageOverride)
+            {
+                SetDamage(true);
+                _isDamageOverride = true;
+            }
+        }
+        else
+        {
+            if (!_isDamageEnabled) SetDamage(true);
+            _isDamageOverride = false;
         }
     }
-    else if (_isBoostPrevious)
+    else
     {
-        Player.Collision.SetCollisionSphere(Player.CollisionType.Default, 1.0f);
-        Player.Collision.SetEntityCollision(true);
-        _isBoostPrevious = false;
+        if (_isDamageEnabled && !_damageStates.Contains(stateId)) SetDamage(false);
+        _isDamageOverride = false;
     }
 }
