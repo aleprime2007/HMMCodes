@@ -60,7 +60,7 @@ WriteAsmHook
 
     originalReplace:
         pop edi
-        mov dword ptr [esi+0x320]
+        mov dword ptr [esi+0x320], 0
     ",
     ASLR(0x004CB4B6), HookBehavior.Replace
 )
